@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:steps_tracker/Themes/colors.dart';
 import 'package:steps_tracker/models/bottom_nav_bar.dart';
@@ -79,12 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   width: 10,
                                 ),
-                                const Text(
+                                 Text(
                                   'Good Evening, John',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                                  style: GoogleFonts.darkerGrotesque(
                                     fontSize: 24,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ]),
@@ -111,11 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        StreamBuilder<StepCount>(
-                                            stream: Pedometer.stepCountStream,
+                                         StreamBuilder<StepCount>(
+                                            stream: StepTrackerModel().stepCountStream,
                                             builder: (context, snapshot) {
                                               return Text(
-                                                '${StepCount().steps}',
+                                                '${snapshot.data?.steps ?? 0}',
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 40,
@@ -176,35 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           // Empty body since we're using SliverFillRemaining
         ),
-      ),
-      bottomNavigationBar: BottomNavyBar(
-        // borderRadius: const BorderRadius.only(
-        //     topRight: Radius.circular(10), topLeft: Radius.circular(10)),
-        backgroundColor: Colors.white,
-        selectedIndex: _selectedIndex,
-        onItemSelected: _onItemSelected,
-        items: [
-          BottomNavyBarItem(
-            icon: const Icon(Icons.home),
-            title: const Text('Home'),
-            activeColor: colors.activePage,
-          ),
-          BottomNavyBarItem(
-            icon: const Icon(Icons.analytics_rounded),
-            title: const Text('Leaderboard'),
-            activeColor: colors.activePage,
-          ),
-          BottomNavyBarItem(
-            icon: const Icon(Icons.donut_large),
-            title: const Text('Analytics'),
-            activeColor: colors.activePage,
-          ),
-          BottomNavyBarItem(
-            icon: const Icon(Icons.settings),
-            title: const Text('Settings'),
-            activeColor: colors.activePage,
-          ),
-        ],
       ),
     );
   }

@@ -36,6 +36,23 @@ class HomePage extends StatelessWidget {
         child: Text('Signout'));
   }
 
+  Widget _signInButton() {
+    return ElevatedButton(
+      onPressed: signInWithGoogle,  // Direct reference to the function
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            'assets/google_logo.png',  // Make sure to add this image to your assets
+            height: 24.0,
+          ),
+          const SizedBox(width: 12.0),
+          const Text('Sign in with Google'),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,9 +60,16 @@ class HomePage extends StatelessWidget {
         title: _title(),
       ),
       body: Container(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          children: [_userUid(), _signOutButton()],
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _userUid(),
+              const SizedBox(height: 16.0),
+              user == null ? _signInButton() : _signOutButton(),
+            ],
+          ),
         ),
       ),
     );
