@@ -14,9 +14,8 @@ class HomePage extends StatelessWidget {
     await Auth().signOut();
   }
 
-  void functionOne(){
+  void functionOne() {
     MaterialPageRoute(builder: (BuildContext context) => LandinPage());
-
   }
 
   Widget _title() {
@@ -31,26 +30,26 @@ class HomePage extends StatelessWidget {
     return ElevatedButton(
         onPressed: () {
           signOut;
-          
         },
         child: Text('Signout'));
   }
 
   Widget _signInButton() {
-    return ElevatedButton(
-      onPressed: signInWithGoogle,  // Direct reference to the function
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            'assets/google_logo.png',  // Make sure to add this image to your assets
-            height: 24.0,
-          ),
-          const SizedBox(width: 12.0),
-          const Text('Sign in with Google'),
-        ],
-      ),
-    );
+    return Placeholder();
+    // ElevatedButton(
+    //   onPressed: signInWithGoogle, // Direct reference to the function
+    //   child: Row(
+    //     mainAxisSize: MainAxisSize.min,
+    //     children: [
+    //       Image.asset(
+    //         'assets/google_logo.png', // Make sure to add this image to your assets
+    //         height: 24.0,
+    //       ),
+    //       const SizedBox(width: 12.0),
+    //       const Text('Sign in with Google'),
+    //     ],
+    //   ),
+    // );
   }
 
   @override

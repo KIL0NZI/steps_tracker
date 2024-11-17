@@ -1,23 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'dart:io';
+import 'dart:developer';
+import 'package:flutter/foundation.dart';
 
+@override
 class StepTrackerModel {
-
   // Stream controllers
-  Stream<StepCount> _stepCountStream = const Stream.empty();
-  Stream<PedestrianStatus> _pedestrianStatusStream = const Stream.empty();
+  Stream<StepCount>? _stepCountStream;
+  Stream<PedestrianStatus>? _pedestrianStatusStream;
 
   // Public stream getters
-  Stream<StepCount> get stepCountStream => _stepCountStream;
+  Stream<StepCount> get stepCountStream =>
+      _stepCountStream ?? const Stream.empty();
   Stream<PedestrianStatus> get pedestrianStatusStream =>
-      _pedestrianStatusStream;
+      _pedestrianStatusStream ?? const Stream.empty();
 
   // Add these properties
   int _steps = 0;
   StreamController<int>? _stepController;
-  
+
   // Add getter for current steps
   int get steps => _steps;
 
@@ -26,7 +30,7 @@ class StepTrackerModel {
       // Request permissions first
       if (Platform.isAndroid) {
         final status = await Permission.activityRecognition.request();
-        print('Permission status: $status');
+        log('Permission status: $status');
         if (!status.isGranted) {
           throw Exception('Permission denied');
         }
@@ -34,22 +38,22 @@ class StepTrackerModel {
 
       // Initialize the stream controller
       _stepController = StreamController<int>.broadcast();
-      
+
       // Initialize the pedometer streams
       _stepCountStream = await Pedometer.stepCountStream;
-      print('Step count stream initialized');
+      log('Step count stream initialized');
       _pedestrianStatusStream = await Pedometer.pedestrianStatusStream;
 
       // Listen to the step count stream
-      _stepCountStream.listen((StepCount event) {
-        print('Steps received: ${event.steps}');
+      _stepCountStream?.listen((StepCount event) {
+        log('Steps received: ${event.steps}');
         _steps = event.steps;
         _stepController?.add(_steps);
       }).onError((error) {
-        print('Error in step count stream: $error');
+        log('Error in step count stream: $error');
       });
     } catch (error) {
-      print('Error initializing step tracker: $error');
+      log('Error initializing step tracker: $error');
       rethrow;
     }
   }

@@ -18,23 +18,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
 
-  // StepCount stepCount = StepCount();
+  // // StepCount stepCount = StepCount();
 
-  void _onItemSelected(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
-    }
-    if (index == 1) {
-      MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
-    }
-    if (index == 2) {
-      MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
-    }
+  // void _onItemSelected(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //   });
+  //   if (index == 0) {
+  //     MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
+  //   }
+  //   if (index == 1) {
+  //     MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
+  //   }
+  //   if (index == 2) {
+  //     MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
+  //   }
+  // }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    StepTrackerModel().initialize();
   }
 
   bool _isExpanded = true;
