@@ -1,49 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:pedometer/pedometer.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:steps_tracker/Themes/colors.dart';
-import 'package:steps_tracker/models/bottom_nav_bar.dart';
-import 'package:steps_tracker/models/progress_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:steps_tracker/models/step_tracker_model.dart';
-import 'package:steps_tracker/tabs/leaderboard_tab.dart';
+import 'package:steps_tracker/state/steps_tracker_cubit.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({
-    super.key,
-  });
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // int _selectedIndex = 0;
-
-  // // StepCount stepCount = StepCount();
-
-  // void _onItemSelected(int index) {
-  //   setState(() {
-  //     _selectedIndex = index;
-  //   });
-  //   if (index == 0) {
-  //     MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
-  //   }
-  //   if (index == 1) {
-  //     MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
-  //   }
-  //   if (index == 2) {
-  //     MaterialPageRoute(builder: (BuildContext context) => const LeaderBoard());
-  //   }
-  // }
+  bool isExpanded = true;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     StepTrackerModel().initialize();
   }
-
-  bool _isExpanded = true;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
               flexibleSpace: LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                 var appBarHeight = constraints.biggest.height;
-                _isExpanded = appBarHeight > 150;
+                isExpanded = appBarHeight > 150;
 
                 return FlexibleSpaceBar(
                   background: Container(
@@ -73,83 +46,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: SafeArea(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: Colors.white,
-                                  child: Icon(Icons.person,
-                                      size: 30, color: Colors.black),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                 Text(
-                                  'Good Evening, John',
-                                  style: GoogleFonts.darkerGrotesque(
-                                    fontSize: 24,
-                                  ),
-                                ),
-                              ]),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: 180,
-                                height: 180,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Container(
-                                      width: 180,
-                                      height: 180,
-                                      child: CustomCircularProgressIndicator(
-                                        progress: 0.75, // 75% progress
-                                        strokeWidth: 25.0,
-                                        innerRadius: 0.0,
-                                        progressColor: Colors.blue,
-                                        backgroundColor: Colors.grey.shade200,
-                                      ),
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                         StreamBuilder<StepCount>(
-                                            stream: StepTrackerModel().stepCountStream,
-                                            builder: (context, snapshot) {
-                                              return Text(
-                                                '${snapshot.data?.steps ?? 0}',
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 40,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              );
-                                            }),
-                                        const Text(
-                                          'steps',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              const Text(
-                                'Daily Goal: 10,000 steps',
-                                style: TextStyle(
+                          BlocBuilder<StepTrackerCubit, int>(
+                            builder: (context, steps) {
+                              return Text(
+                                '$steps',
+                                style: const TextStyle(
                                   color: Colors.black,
-                                  fontSize: 16,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            ],
+                              );
+                            },
+                          ),
+                          const Text(
+                            'steps',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
                           ),
                         ],
                       ),
@@ -164,14 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             color: Colors.white, // Optional: adds background color
             child: GridView.count(
-              physics:
-                  const NeverScrollableScrollPhysics(), // Prevents grid scrolling
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(16),
+              physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              children: [
+              children: <Widget>[
                 _buildStatCard(
                     'Calories', '350 kcal', Icons.local_fire_department),
                 _buildStatCard('Distance', '2.5 km', Icons.directions_walk),
@@ -180,7 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          // Empty body since we're using SliverFillRemaining
         ),
       ),
     );

@@ -1,34 +1,47 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:steps_tracker/models/new_user.dart';
-import 'package:steps_tracker/models/permission_service.dart';
-import 'package:steps_tracker/screens/auth_screen.dart';
-import 'package:steps_tracker/tabs/home_page_tab.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:steps_tracker/app.dart';
+import 'package:steps_tracker/firebase_options.dart';
+import 'package:steps_tracker/models/step_tracker_model.dart';
+import 'package:steps_tracker/screens/landing_screen.dart';
+import 'package:steps_tracker/services/permission_service.dart';
+import 'package:steps_tracker/state/steps_tracker_cubit.dart';
 
 void main() async {
-    WidgetsFlutterBinding.ensureInitialized();
-
-    final hasPermission = await PermissionsService.requestStepPermissions();
-    if (hasPermission) {
-      debugPrint('Permission granted');
-      // Initialize your step tracking here
-    } else {
-      debugPrint('Permission denied');
-    }
-
-  runApp(MyApp());
-}
-
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    NewUser newUser = NewUser();
-    return MaterialApp(
-      home: HomeScreen(),
-      debugShowCheckedModeBanner: false,
-    );
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isNew = prefs.getBool('isNew') ?? true;
+  if (isNew) {
+    prefs.setBool('isNew', false);
   }
+
+  Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  final hasPermission = await PermissionsService.requestStepPermissions();
+  if (hasPermission) {
+    debugPrint('Permission granted');
+    // Initialize your step tracking here
+    await StepTrackerModel().initialize();
+  } else {
+    debugPrint('Permission denied');
+  }
+
+  runApp(
+    MultiProvider(
+      providers: [
+        BlocProvider(create: (_) => StepTrackerCubit()),
+      ],
+      child: isNew
+          ? MaterialApp(
+              home: LandinPage(),
+              debugShowCheckedModeBanner: false,
+            )
+          : App(),
+    ),
+  );
 }
