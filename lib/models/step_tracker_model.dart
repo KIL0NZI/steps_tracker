@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:developer';
-import 'package:flutter/foundation.dart';
 
 @override
 class StepTrackerModel {
@@ -40,9 +38,10 @@ class StepTrackerModel {
       _stepController = StreamController<int>.broadcast();
 
       // Initialize the pedometer streams
-      _stepCountStream = await Pedometer.stepCountStream;
+      _stepCountStream = Pedometer.stepCountStream;
       log('Step count stream initialized');
-      _pedestrianStatusStream = await Pedometer.pedestrianStatusStream;
+      _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
+      log('Pedestrian status stream initialized');
 
       // Listen to the step count stream
       _stepCountStream?.listen((StepCount event) {
