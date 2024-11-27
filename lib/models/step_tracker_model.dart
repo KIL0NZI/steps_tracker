@@ -7,6 +7,8 @@ import 'dart:developer';
 @override
 class StepTrackerModel {
   // Stream controllers
+  StreamSubscription? _stepCountSubscription;
+  int? finalSteps;
   Stream<StepCount>? _stepCountStream;
   Stream<PedestrianStatus>? _pedestrianStatusStream;
 
@@ -33,7 +35,6 @@ class StepTrackerModel {
           throw Exception('Permission denied');
         }
       }
-
       // Initialize the stream controller
       _stepController = StreamController<int>.broadcast();
 
@@ -45,10 +46,16 @@ class StepTrackerModel {
 
       // Listen to the step count stream
       _stepCountStream?.listen((StepCount event) {
-        log('Steps received: ${event.steps}');
+        // log('Steps received: ${event.steps}');
         _steps = event.steps;
         _stepController?.add(_steps);
-      }).onError((error) {
+      }).
+
+          // _stepCountSubscription = _stepCountStream?.listen((StepCount event) {
+          // _steps = event.steps; // Update the steps
+          // _stepController?.add(_steps); // Pass steps to the controller
+          // });
+          onError((error) {
         log('Error in step count stream: $error');
       });
     } catch (error) {
@@ -57,8 +64,16 @@ class StepTrackerModel {
     }
   }
 
-  // Add dispose method
-  void dispose() {
+  Future<void> dispose() async {
+    finalSteps = steps;
     _stepController?.close();
+    _stepController?.sink.add(_steps);
+    log('Step tracker disposed completely $finalSteps');
   }
 }
+
+  // Add dispose method
+  // void dispose() {
+  //   _stepController?.close();
+  // }
+
