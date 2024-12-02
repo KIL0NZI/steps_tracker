@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:steps_tracker/models/step_tracker_model.dart';
+import 'package:steps_tracker/services/permission_service.dart';
 
 class StepTrackerCubit extends Cubit<int> {
   final StepTrackerModel _stepTrackerModel = StepTrackerModel();
@@ -12,21 +12,29 @@ class StepTrackerCubit extends Cubit<int> {
   }
 
   void initialize() async {
-    await _stepTrackerModel.initialize();
-    _stepTrackerModel.stepCountStream.listen((event) {
-      if (state != event.steps) {
-      }
-      log(' Todays steps are $event');
-    });
-  }
-  //dont even know what I was trying and catching here...maybe I should catch some bitches
-  void reset() {
-    try {
-      emit(0);
-      log('steps reset to 0');
-      _stepTrackerModel.dispose();
-    } catch (error) {
-      log('error bro $error');
+    final hasPermission = await PermissionsService.requestStepPermissions();
+    if (hasPermission) {
+      log('Permission granted');
+
+      await _stepTrackerModel.initialize();
+      _stepTrackerModel.stepCountStream.listen((event) {
+        emit(event); // Emit the current step count
+        log('Todays steps are $event');
+      });
+    } else {
+      log('Permission denied');
     }
+  }
+
+  void reset() {
+    _stepTrackerModel.resetSteps(); // Reset the steps in the model
+    emit(0); // Emit zero to the state
+    log('Steps reset to 0');
+  }
+
+  @override
+  Future<void> close() {
+    _stepTrackerModel.dispose(); // Ensure to clean up resources if needed
+    return super.close();
   }
 }

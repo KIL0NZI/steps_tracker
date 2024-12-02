@@ -1,4 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
 
 class Auth {
   final _firebaseAuth = FirebaseAuth.instance;
@@ -11,9 +14,9 @@ class Auth {
     required String email,
     required String password,
   }) async {
-    try{
-    await _firebaseAuth.signInWithEmailAndPassword(
-        email: email, password: password);
+    try {
+      await _firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         throw 'No user found for that email.';
@@ -30,8 +33,16 @@ class Auth {
     required String email,
     required String password,
   }) async {
-    await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email, password: password);
+    try {
+      await _firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
+    } on FirebaseException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        log('email already in use');
+      }
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   Future<void> signOut() async {

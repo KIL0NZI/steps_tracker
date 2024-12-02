@@ -11,7 +11,7 @@ class PeriodicSteps extends StepTrackerCubit {
   void finalDailySteps() {
     reset();
     StepTrackerCubit().initialize();
-    StepTrackerModel().dispose();
+    // StepTrackerModel().dispose();
   }
 }
 // }

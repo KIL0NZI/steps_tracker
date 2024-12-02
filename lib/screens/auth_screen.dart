@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:steps_tracker/models/auth.dart';
 
 class AuthScreen extends StatefulWidget {
   AuthScreen({super.key});
@@ -69,9 +70,15 @@ class _AuthScreenState extends State<AuthScreen> {
               height: 20,
             ),
             ElevatedButton(
-              onPressed: () {
-                log('${_email.text} ${_passWord.text}');
-                // Handle login logic
+              onPressed: () async {
+                try {
+                  var user = await Auth().createUserWithEmailAndPassword(
+                      email: _email.text, password: _passWord.text);
+                  log('${_email.text} ${_passWord.text}');
+                  // Handle login logic
+                } catch (e) {
+                  log('Error signing in: $e');
+                }
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(

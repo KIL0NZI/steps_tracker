@@ -21,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     StepTrackerModel().initialize();
-    PeriodicSteps().finalDailySteps();
     // StepTrackerCubit().initialize();
     // StepTrackerCubit().reset();
   }
@@ -116,8 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 ElevatedButton(
                     onPressed: () {
-                      //hii iko kwa steps_tracker
-                      StepTrackerCubit().reset();
+                      // TODO: Add reset logic here
+                      context.read<StepTrackerCubit>().reset();
                     },
                     child: Text('Reset'))
               ]),
