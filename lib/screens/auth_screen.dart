@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:steps_tracker/models/auth.dart';
 
 class AuthScreen extends StatefulWidget {
-  AuthScreen({super.key});
+  const AuthScreen({super.key});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -72,7 +72,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  var user = await Auth().createUserWithEmailAndPassword(
+                  await Auth().createUserWithEmailAndPassword(
                       email: _email.text, password: _passWord.text);
                   log('${_email.text} ${_passWord.text}');
                   // Handle login logic
