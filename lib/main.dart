@@ -1,12 +1,9 @@
-import 'dart:developer';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steps_tracker/firebase_options.dart';
-import 'package:steps_tracker/models/step_tracker_model.dart';
-import 'package:steps_tracker/services/permission_service.dart';
 import 'package:steps_tracker/state/steps_tracker_cubit.dart';
 import 'package:steps_tracker/tabs/home_page_tab.dart';
 
