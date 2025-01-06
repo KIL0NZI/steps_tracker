@@ -1,9 +1,12 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:steps_tracker/models/auth.dart';
+import 'package:steps_tracker/screens/new_user_screen.dart';
+import 'package:steps_tracker/screens/user_information_screen.dart';
+import 'package:steps_tracker/tabs/home_page_tab.dart';
 
 class AuthScreen extends StatefulWidget {
-  AuthScreen({super.key});
+  const AuthScreen({super.key});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -37,7 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Hello There :)',
+              'Welcome Back :)',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
@@ -72,12 +75,21 @@ class _AuthScreenState extends State<AuthScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  var user = await Auth().createUserWithEmailAndPassword(
-                      email: _email.text, password: _passWord.text);
+                  await Auth().signInWithEmailAndPassword(
+                      email: _email.text.trim(),
+                      password: _passWord.text.trim());
                   log('${_email.text} ${_passWord.text}');
+
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Hello ${_email.text}')));
                   // Handle login logic
                 } catch (e) {
                   log('Error signing in: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Incorrect Email or Password')));
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -91,27 +103,55 @@ class _AuthScreenState extends State<AuthScreen> {
             SizedBox(
               height: 10,
             ),
-            ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9)),
-                  backgroundColor: Colors.white,
-                  minimumSize: Size(double.infinity, 50), // Full width button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Don't have an account? "),
+                SizedBox(
+                  width: 5,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.network(
-                      'http://pngimg.com/uploads/google/google_PNG19635.png',
-                      height: 40,
-                      width: 40,
-                      fit: BoxFit.cover,
-                    ),
-                    Text('Continue with Google')
-                  ],
-                ))
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(
+                            builder: (context) => NewUserScreen()));
+                    log('I have been touched helppp!');
+                  },
+                  child: Text(
+                    'Create Account',
+                    style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.blueGrey,
+                        decorationThickness: 2),
+                  ),
+                )
+              ],
+            )
+            // ElevatedButton(
+            //     onPressed: () {
+            //       Auth().linkGoogle();
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(9)),
+            //       backgroundColor: Colors.white,
+            //       minimumSize: Size(double.infinity, 50), // Full width button
+            //     ),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       crossAxisAlignment: CrossAxisAlignment.center,
+            //       children: [
+            //         Image.network(
+            //           'http://pngimg.com/uploads/google/google_PNG19635.png',
+            //           height: 40,
+            //           width: 40,
+            //           fit: BoxFit.cover,
+            //         ),
+            //         Text('Continue with Google')
+            //       ],
+            //     ))
           ],
         ),
       ),
