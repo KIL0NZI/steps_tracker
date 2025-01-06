@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:steps_tracker/models/periodic_steps.dart';
 import 'package:steps_tracker/models/progress_bar.dart';
 import 'package:steps_tracker/models/step_tracker_model.dart';
 import 'package:steps_tracker/state/steps_tracker_cubit.dart';

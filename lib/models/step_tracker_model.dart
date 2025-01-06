@@ -6,13 +6,14 @@ import 'dart:developer';
 
 class StepTrackerModel {
   StreamSubscription<StepCount>? _stepCountSubscription;
-  int _steps = 0;
+  int _initialSteps = -1;
+  int _currentSteps = 0;
   StreamController<int>? _stepController;
 
   Stream<int> get stepCountStream =>
       _stepController?.stream ?? const Stream.empty();
 
-  int get steps => _steps;
+  int get steps => _initialSteps == -1 ? 0 : _currentSteps - _initialSteps;
 
   Future<void> initialize() async {
     try {
@@ -25,36 +26,49 @@ class StepTrackerModel {
       }
 
       _stepController = StreamController<int>.broadcast();
-
-      _stepCountSubscription =
-          Pedometer.stepCountStream.listen((StepCount event) {
-        _steps = event.steps;
-        _stepController?.add(_steps);
-      }, onError: (error) {
-        log('Error in step count stream: $error');
-      });
+      await _initializeStepCounting();
     } catch (error) {
       log('Error initializing step tracker: $error');
       rethrow;
     }
   }
 
-  void resetSteps() async {
-    // Set everything to null or reset values
-    _stepCountSubscription?.cancel();
-    _stepCountSubscription = null;
-    _steps = 0;
-    _stepController?.close();
-    _stepController = null;
+  Future<void> _initializeStepCounting() async {
+    _stepCountSubscription =
+        Pedometer.stepCountStream.listen((StepCount event) {
+      if (_initialSteps == -1) {
+        _initialSteps = event.steps;
+      }
+      _currentSteps = event.steps;
+      final currentSteps = _currentSteps - _initialSteps;
+      _stepController?.add(currentSteps);
+    }, onError: (error) {
+      log('Error in step count stream: $error');
+    });
+  }
 
-    log("Steps have been reset");
+  Future<void> resetSteps() async {
+    try {
+      await _stepCountSubscription?.cancel();
+      _stepCountSubscription = null;
 
-    // Reinitialize to start listening again
-    await initialize();
+      final currentReading = await Pedometer.stepCountStream.first;
+      _initialSteps = currentReading.steps;
+      _currentSteps = _initialSteps;
+      _stepController?.add(0);
+
+      await _initializeStepCounting();
+      log("Steps have been reset");
+    } catch (error) {
+      log('Error resetting steps: $error');
+      rethrow;
+    }
   }
 
   Future<void> dispose() async {
     await _stepCountSubscription?.cancel();
     await _stepController?.close();
+    _initialSteps = -1;
+    _currentSteps = 0;
   }
 }

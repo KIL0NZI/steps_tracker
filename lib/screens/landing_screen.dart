@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:steps_tracker/screens/auth_screen.dart';
 import 'package:steps_tracker/tabs/home_page_tab.dart';
 
 class LandinPage extends StatelessWidget {
