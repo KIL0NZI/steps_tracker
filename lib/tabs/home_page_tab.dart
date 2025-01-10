@@ -103,28 +103,34 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ];
       },
-      body: Center(
-        child: Container(
-          color: Colors.white,
-          // padding: EdgeInsets.all(200.0), // Optional: adds background color
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ElevatedButton(
-                    onPressed: () {
-                      // TODO: Add reset logic here
-                      context.read<StepTrackerCubit>().reset();
-                    },
-                    child: Text('Reset'))
-              ]),
-        ),
-      ),
+      body: Column(
+        children: [
+          leaderBoard(),
+        ],
+      )
+      // Center(
+      //   child: Container(
+      //     color: Colors.white,
+      //     // padding: EdgeInsets.all(200.0), // Optional: adds background color
+      //     child: Row(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         crossAxisAlignment: CrossAxisAlignment.start,
+      //         children: [
+      //           ElevatedButton(
+      //               onPressed: () {
+      //                 // TODO: Add reset logic here
+      //                 context.read<StepTrackerCubit>().reset();
+      //               },
+      //               child: Text('Reset'))
+      //         ]),
+      //   ),
+      // ),
     ));
   }
 
   Widget leaderBoard() {
     List<TableRow> rows = [];
+    ScrollView()
     for (int i = 0; i < 100; i++) {
       rows.add(TableRow(children: [
         Text("number " + i.toString()),

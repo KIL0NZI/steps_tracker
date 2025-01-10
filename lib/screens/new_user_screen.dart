@@ -1,18 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:steps_tracker/models/auth.dart';
-import 'package:steps_tracker/screens/new_user_screen.dart';
 import 'package:steps_tracker/screens/user_information_screen.dart';
-import 'package:steps_tracker/tabs/home_page_tab.dart';
 
-class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+class NewUserScreen extends StatefulWidget {
+  const NewUserScreen({super.key});
 
   @override
-  State<AuthScreen> createState() => _AuthScreenState();
+  State<NewUserScreen> createState() => _NewUserScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _NewUserScreenState extends State<NewUserScreen> {
   late TextEditingController _email = TextEditingController();
   late final TextEditingController _passWord = TextEditingController();
 
@@ -20,27 +20,32 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     _email = TextEditingController();
   }
 
   @override
   void dispose() {
+    // TODO: implement dispose
+    super.dispose();
     _email.dispose();
     _passWord.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Welcome Back :)',
+              'Hello There :)',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
@@ -75,13 +80,12 @@ class _AuthScreenState extends State<AuthScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  await Auth().signInWithEmailAndPassword(
+                  await Auth().createUserWithEmailAndPassword(
                       email: _email.text.trim(),
                       password: _passWord.text.trim());
                   log('${_email.text} ${_passWord.text}');
-
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()));
+                      MaterialPageRoute(builder: (context) => UserInformationScreen()));
 
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Hello ${_email.text}')));
@@ -89,7 +93,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 } catch (e) {
                   log('Error signing in: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Incorrect Email or Password')));
+                      SnackBar(content: Text('Email already in use')));
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -98,60 +102,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 backgroundColor: Colors.amberAccent,
                 minimumSize: Size(double.infinity, 50), // Full width button
               ),
-              child: Text('Sign In'),
+              child: Text('Sign Up'),
             ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text("Don't have an account? "),
-                SizedBox(
-                  width: 5,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(
-                            builder: (context) => NewUserScreen()));
-                    log('I have been touched helppp!');
-                  },
-                  child: Text(
-                    'Create Account',
-                    style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.blueGrey,
-                        decorationThickness: 2),
-                  ),
-                )
-              ],
-            )
-            // ElevatedButton(
-            //     onPressed: () {
-            //       Auth().linkGoogle();
-            //     },
-            //     style: ElevatedButton.styleFrom(
-            //       shape: RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.circular(9)),
-            //       backgroundColor: Colors.white,
-            //       minimumSize: Size(double.infinity, 50), // Full width button
-            //     ),
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         Image.network(
-            //           'http://pngimg.com/uploads/google/google_PNG19635.png',
-            //           height: 40,
-            //           width: 40,
-            //           fit: BoxFit.cover,
-            //         ),
-            //         Text('Continue with Google')
-            //       ],
-            //     ))
           ],
         ),
       ),
