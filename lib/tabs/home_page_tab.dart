@@ -130,7 +130,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget leaderBoard() {
     List<TableRow> rows = [];
-    ScrollView()
     for (int i = 0; i < 100; i++) {
       rows.add(TableRow(children: [
         Text("number " + i.toString()),

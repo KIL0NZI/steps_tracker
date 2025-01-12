@@ -1,8 +1,9 @@
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:steps_tracker/models/auth.dart';
+import 'package:steps_tracker/screens/auth_screen.dart';
 import 'package:steps_tracker/screens/user_information_screen.dart';
 
 class NewUserScreen extends StatefulWidget {
@@ -14,9 +15,27 @@ class NewUserScreen extends StatefulWidget {
 
 class _NewUserScreenState extends State<NewUserScreen> {
   late TextEditingController _email = TextEditingController();
+  late final TextEditingController _username = TextEditingController();
   late final TextEditingController _passWord = TextEditingController();
 
   bool _isObscured = true;
+
+  Future<void> saveUserToFirestore(
+      String uid, String username, String email) async {
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'username': username,
+        'email': email,
+        'createdAt': FieldValue.serverTimestamp()
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User saved successfully!')),);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),);
+      log(e.toString());
+    }
+  }
 
   @override
   void initState() {
@@ -31,14 +50,12 @@ class _NewUserScreenState extends State<NewUserScreen> {
     super.dispose();
     _email.dispose();
     _passWord.dispose();
+    _username.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -49,6 +66,15 @@ class _NewUserScreenState extends State<NewUserScreen> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
+            TextField(
+                controller: _username,
+                decoration: InputDecoration(
+                  labelText: 'username',
+                  border: OutlineInputBorder(),
+                )),
+            SizedBox(
+              height: 10,
+            ),
             TextField(
               controller: _email,
               decoration: InputDecoration(
@@ -81,11 +107,20 @@ class _NewUserScreenState extends State<NewUserScreen> {
               onPressed: () async {
                 try {
                   await Auth().createUserWithEmailAndPassword(
+                      username: _username.text.trim(),
                       email: _email.text.trim(),
                       password: _passWord.text.trim());
                   log('${_email.text} ${_passWord.text}');
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => UserInformationScreen()));
+
+                  await saveUserToFirestore(
+                    String username = _username.text.trim(),
+                    String email = _email.text.trim(),
+                    String uid = 
+                  );
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UserInformationScreen()));
 
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Hello ${_email.text}')));
@@ -104,6 +139,34 @@ class _NewUserScreenState extends State<NewUserScreen> {
               ),
               child: Text('Sign Up'),
             ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Already have an account? "),
+                SizedBox(
+                  width: 5,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => AuthScreen()));
+                    log('I have been touched helppp!');
+                  },
+                  child: Text(
+                    'Log in instead',
+                    style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.blueGrey,
+                        decorationThickness: 2),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),

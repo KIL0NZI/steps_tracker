@@ -9,6 +9,7 @@ import 'package:steps_tracker/firebase_options.dart';
 import 'package:steps_tracker/screens/auth_screen.dart';
 import 'package:steps_tracker/state/steps_tracker_cubit.dart';
 import 'package:steps_tracker/tabs/home_page_tab.dart';
+import 'package:steps_tracker/screens/new_user_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,8 +18,7 @@ void main() async {
   if (isNew) {
     prefs.setBool('isNew', false);
     log('First time?');
-  }
-  else{
+  } else {
     log("I'm not exactly a newcomer tho");
   }
 
@@ -31,11 +31,8 @@ void main() async {
         providers: [
           BlocProvider(create: (_) => StepTrackerCubit()),
         ],
-        child:
-            // isNew
-            //     ?
-            MaterialApp(
-          home: isNew? AuthScreen():HomeScreen(),
+        child: MaterialApp(
+          home: isNew ? HomeScreen() : NewUserScreen(),
           debugShowCheckedModeBanner: false,
         )
         // : App(),

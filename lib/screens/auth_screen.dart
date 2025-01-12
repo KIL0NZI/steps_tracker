@@ -103,6 +103,32 @@ class _AuthScreenState extends State<AuthScreen> {
             SizedBox(
               height: 10,
             ),
+                        ElevatedButton(
+                onPressed: () {
+                  Auth().linkGoogle();
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(9)),
+                  backgroundColor: Colors.white,
+                  minimumSize: Size(double.infinity, 50), // Full width button
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.network(
+                      'http://pngimg.com/uploads/google/google_PNG19635.png',
+                      height: 40,
+                      width: 40,
+                      fit: BoxFit.cover,
+                    ),
+                    Text('Continue with Google')
+                  ],
+                )),
+            SizedBox(
+              height: 10,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,7 +139,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(context,
+                    Navigator.pushReplacement(
+                        context,
                         MaterialPageRoute(
                             builder: (context) => NewUserScreen()));
                     log('I have been touched helppp!');
@@ -128,30 +155,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 )
               ],
-            )
-            // ElevatedButton(
-            //     onPressed: () {
-            //       Auth().linkGoogle();
-            //     },
-            //     style: ElevatedButton.styleFrom(
-            //       shape: RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.circular(9)),
-            //       backgroundColor: Colors.white,
-            //       minimumSize: Size(double.infinity, 50), // Full width button
-            //     ),
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         Image.network(
-            //           'http://pngimg.com/uploads/google/google_PNG19635.png',
-            //           height: 40,
-            //           width: 40,
-            //           fit: BoxFit.cover,
-            //         ),
-            //         Text('Continue with Google')
-            //       ],
-            //     ))
+            ),
           ],
         ),
       ),
