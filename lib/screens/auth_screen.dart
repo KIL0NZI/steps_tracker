@@ -105,7 +105,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
                         ElevatedButton(
                 onPressed: () {
-                  Auth().linkGoogle();
+                  Auth().signInWithGoogle();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(

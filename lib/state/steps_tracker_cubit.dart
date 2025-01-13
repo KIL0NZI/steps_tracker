@@ -15,7 +15,6 @@ class StepTrackerCubit extends Cubit<int> {
     final hasPermission = await PermissionsService.requestStepPermissions();
     if (hasPermission) {
       log('Permission granted');
-
       await _stepTrackerModel.initialize();
       _stepTrackerModel.stepCountStream.listen((event) {
         emit(event); // Emit the current step count
