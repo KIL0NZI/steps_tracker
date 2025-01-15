@@ -113,9 +113,10 @@ class _NewUserScreenState extends State<NewUserScreen> {
                   log('${_email.text} ${_passWord.text}');
 
                   await saveUserToFirestore(
-                    String username = _username.text.trim(),
-                    String email = _email.text.trim(),
-                    String uid = 
+                    // Stri
+                    // ng username = _username.text.trim(),
+                    // String email = _email.text.trim(),
+                    // String uid = 
                   );
                   Navigator.pushReplacement(
                       context,
