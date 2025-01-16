@@ -113,6 +113,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
                   log('${_email.text} ${_passWord.text}');
 
                   await saveUserToFirestore(
+                    //add doc to firestore
                     // Stri
                     // ng username = _username.text.trim(),
                     // String email = _email.text.trim(),
