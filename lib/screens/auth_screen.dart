@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:steps_tracker/models/auth.dart';
 import 'package:steps_tracker/screens/new_user_screen.dart';
-import 'package:steps_tracker/screens/user_information_screen.dart';
 import 'package:steps_tracker/tabs/home_page_tab.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -13,6 +12,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  final Auth _auth = Auth();
   late TextEditingController _email = TextEditingController();
   late final TextEditingController _passWord = TextEditingController();
 
@@ -103,9 +103,19 @@ class _AuthScreenState extends State<AuthScreen> {
             SizedBox(
               height: 10,
             ),
-                        ElevatedButton(
-                onPressed: () {
-                  Auth().signInWithGoogle();
+            ElevatedButton(
+                onPressed: () async {
+                  try {
+                    bool result = await _auth.signInWithGoogle();
+                    if (result) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomeScreen()));
+                    }
+                  } catch (e) {
+                    log('haki ya nani ${e.toString()}');
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(

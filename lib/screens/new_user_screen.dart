@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:steps_tracker/models/auth.dart';
 import 'package:steps_tracker/screens/auth_screen.dart';
-import 'package:steps_tracker/screens/user_information_screen.dart';
+import 'package:steps_tracker/tabs/home_page_tab.dart';
 
 class NewUserScreen extends StatefulWidget {
   const NewUserScreen({super.key});
@@ -17,6 +17,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
   late TextEditingController _email = TextEditingController();
   late final TextEditingController _username = TextEditingController();
   late final TextEditingController _passWord = TextEditingController();
+  final Auth _auth = Auth();
 
   bool _isObscured = true;
 
@@ -29,10 +30,12 @@ class _NewUserScreenState extends State<NewUserScreen> {
         'createdAt': FieldValue.serverTimestamp()
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User saved successfully!')),);
+        SnackBar(content: Text('User saved successfully!')),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),);
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
       log(e.toString());
     }
   }
@@ -106,26 +109,18 @@ class _NewUserScreenState extends State<NewUserScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  await Auth().createUserWithEmailAndPassword(
+                  await _auth.createUserWithEmailAndPassword(
                       username: _username.text.trim(),
                       email: _email.text.trim(),
                       password: _passWord.text.trim());
                   log('${_email.text} ${_passWord.text}');
-
-                  await saveUserToFirestore(
-                    //add doc to firestore
-                    // Stri
-                    // ng username = _username.text.trim(),
-                    // String email = _email.text.trim(),
-                    // String uid = 
-                  );
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => UserInformationScreen()));
+                          builder: (context) => HomeScreen()));
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Hello ${_email.text}')));
+                      SnackBar(content: Text('Hello ${_username.text}')));
                   // Handle login logic
                 } catch (e) {
                   log('Error signing in: $e');
