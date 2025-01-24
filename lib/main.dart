@@ -22,7 +22,7 @@ void main() async {
     log("I'm not exactly a newcomer tho");
   }
 
-  Firebase.initializeApp(
+  await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 

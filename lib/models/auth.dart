@@ -33,56 +33,55 @@ class Auth {
   Future<bool> createUserWithEmailAndPassword({
     required String email,
     required String password,
-    required String username,
   }) async {
-    bool newUser = true;
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
-
-      if (ema != null) {
-        newUser = false;
-      }
+      return false;
     } on FirebaseException catch (e) {
       if (e.code == 'email-already-in-use') {
-        return newUser = false;
         log('email already in use');
       }
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return true;
     }
+  }
 
-    Future<void> signOut() async {
-      await _firebaseAuth.signOut();
-    }
+  Future<void> signOut() async {
+    await _firebaseAuth.signOut();
+  }
 
-    Future<bool> signInWithGoogle() async {
-      bool result = false;
-      try {
-        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-        final GoogleSignInAuthentication? googleAuth =
-            await googleUser?.authentication;
-        final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth?.accessToken,
-            idToken: googleAuth?.accessToken);
+  Future<bool> signInWithGoogle() async {
+    bool result = false;
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser!.authentication;
+      final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
-        UserCredential userCredential =
-            await _firebaseAuth.signInWithCredential(credential);
-        User? user = userCredential.user;
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
+      User? user = userCredential.user;
 
-        if (user != null) {
-          if (userCredential.additionalUserInfo!.isNewUser) {
-            await _firestore.collection('users').doc(user.uid).set({
-              'username': user.displayName,
-              'uid': user.uid,
-              'profilephoto': user.photoURL
-            });
-          }
+      if (user != null) {
+        if (userCredential.additionalUserInfo!.isNewUser) {
+          await _firestore.collection('users').doc(user.uid).set({
+            'username': user.displayName,
+            'uid': user.uid,
+            'profilephoto': user.photoURL
+          });
         }
-        result = true;
-        return result;
-      } catch (e) {
-        log(e.toString());
-        return result;
+      } else {
+        log('aha gotcha');
       }
+      result = true;
+      return result;
+    } catch (e) {
+      log(e.toString());
+      return result;
     }
   }
 }

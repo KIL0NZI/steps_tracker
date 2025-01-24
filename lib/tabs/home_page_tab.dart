@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:steps_tracker/models/auth.dart';
 import 'package:steps_tracker/models/progress_bar.dart';
 import 'package:steps_tracker/models/step_tracker_model.dart';
 import 'package:steps_tracker/state/steps_tracker_cubit.dart';
@@ -13,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Auth authentication = Auth();
   bool isExpanded = true;
 
   @override
@@ -30,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
       headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
         return <Widget>[
           SliverAppBar(
+            automaticallyImplyLeading: false,
             backgroundColor: Colors.white,
             expandedHeight: 400.0,
             toolbarHeight: 100.0,
@@ -103,41 +106,92 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ];
       },
-      body: Column(
-        children: [
-          leaderBoard(),
-        ],
-      )
-      // Center(
-      //   child: Container(
-      //     color: Colors.white,
-      //     // padding: EdgeInsets.all(200.0), // Optional: adds background color
-      //     child: Row(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         crossAxisAlignment: CrossAxisAlignment.start,
-      //         children: [
-      //           ElevatedButton(
-      //               onPressed: () {
-      //                 // TODO: Add reset logic here
-      //                 context.read<StepTrackerCubit>().reset();
-      //               },
-      //               child: Text('Reset'))
-      //         ]),
-      //   ),
-      // ),
-    ));
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: leaderBoard(),
+      ),
+    )
+        // Center(
+        //   child: Container(
+        //     color: Colors.white,
+        //     // padding: EdgeInsets.all(200.0), // Optional: adds background color
+        //     child: Row(
+        //         mainAxisAlignment: MainAxisAlignment.center,
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           ElevatedButton(
+        //               onPressed: () {
+        //                 // TODO: Add reset logic here
+        //                 context.read<StepTrackerCubit>().reset();
+        //               },
+        //               child: Text('Reset'))
+        //         ]),
+        //   ),
+        // ),
+        );
   }
 
   Widget leaderBoard() {
     List<TableRow> rows = [];
-    for (int i = 0; i < 100; i++) {
+    for (int i = 1; i < 101; i++) {
       rows.add(TableRow(children: [
-        Text("number " + i.toString()),
-        Text("squared " + (i * i).toString()),
+        Padding(
+            padding: EdgeInsets.only(top: 15, bottom: 15),
+            child: Row(
+              children: [
+                // Stack(
+                //   children: [
+                // Container(
+                //   color: Colors.grey,
+                //   decoration: BoxDecoration(shape: BoxShape.circle),
+                // ),
+                //   ],
+                // ),
+                Text(
+                  i.toString(),
+                  style: TextStyle(fontSize: 20),
+                ),
+
+                SizedBox(
+                  width: 40,
+                ),
+                Text(
+                  "*user*",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+              ],
+            )),
+        Padding(
+          padding: EdgeInsets.only(left: 50, top: 15, bottom: 15),
+          child: BlocBuilder<StepTrackerCubit, int>(builder: (context, steps) {
+            return Text(
+              '$steps steps',
+              style: TextStyle(fontSize: 20),
+            );
+          }),
+        )
       ]));
     }
-    return Table(
-      children: rows,
-    );
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 30,
+            ),
+            child: Table(
+              border: TableBorder.symmetric(
+
+                  // top: BorderSide(color: Colors.blue, width: 2.0),
+                  // bottom: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
+              children: rows,
+            ),
+          )
+        ]);
   }
 }

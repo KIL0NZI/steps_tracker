@@ -21,24 +21,24 @@ class _NewUserScreenState extends State<NewUserScreen> {
 
   bool _isObscured = true;
 
-  Future<void> saveUserToFirestore(
-      String uid, String username, String email) async {
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'username': username,
-        'email': email,
-        'createdAt': FieldValue.serverTimestamp()
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User saved successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
-      log(e.toString());
-    }
-  }
+  // Future<void> saveUserToFirestore(
+  //     String uid, String username, String email) async {
+  //   try {
+  //     await FirebaseFirestore.instance.collection('users').doc(uid).set({
+  //       'username': username,
+  //       'email': email,
+  //       'createdAt': FieldValue.serverTimestamp()
+  //     });
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('User saved successfully!')),
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error: ${e.toString()}')),
+  //     );
+  //     log(e.toString());
+  //   }
+  // }
 
   @override
   void initState() {
@@ -109,23 +109,42 @@ class _NewUserScreenState extends State<NewUserScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  await _auth.createUserWithEmailAndPassword(
-                      username: _username.text.trim(),
+                  bool isNew = await _auth.createUserWithEmailAndPassword(
                       email: _email.text.trim(),
                       password: _passWord.text.trim());
                   log('${_email.text} ${_passWord.text}');
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => HomeScreen()));
+                  if (isNew) {
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(_auth.currentUser?.uid)
+                        .set({
+                      'username': _username.text.trim(),
+                      'email': _email.text.trim(),
+                      'createdAt': FieldValue.serverTimestamp(),
+                    });
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Hello ${_username.text}')));
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Hello ${_username.text}')));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('An error occured')));
+                  }
                   // Handle login logic
+                } on FirebaseException catch (e) {
+                  if (e.code == 'email-already-in-use') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content:
+                              Text('Email already in use. Try logging in.')),
+                    );
+                  }
                 } catch (e) {
                   log('Error signing in: $e');
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Email already in use')));
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //     SnackBar(content: Text('Email already in use')));
                 }
               },
               style: ElevatedButton.styleFrom(
