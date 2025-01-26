@@ -41,7 +41,7 @@ class StepTrackerCubit extends Cubit<int> {
   static void callbackDispatcher() {
     Workmanager().executeTask((taskName, inputData) async {
       log('Background task running');
-      // Fetch steps here using platform API (e.g., Google Fit or CMPedometer)
+      //TODO: Fetch steps here using platform API (e.g., Google Fit or CMPedometer)
       return Future.value(true);
     });
   }
@@ -57,6 +57,7 @@ class StepTrackerCubit extends Cubit<int> {
     prefs.setInt('savedSteps', steps);
   }
 
+  @override
   Future<void> close() {
     _stepTrackerModel.dispose();
     return super.close();
