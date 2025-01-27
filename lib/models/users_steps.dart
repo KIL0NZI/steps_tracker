@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
-class UserstepsCard extends StatelessWidget {
-  final String username;
-  final String steps;
-}
+// class UserstepsCard extends StatelessWidget {
+//   final String username;
+//   final String steps;
+// }

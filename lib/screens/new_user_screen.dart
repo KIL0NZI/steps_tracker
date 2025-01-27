@@ -19,6 +19,8 @@ class _NewUserScreenState extends State<NewUserScreen> {
   late final TextEditingController _passWord = TextEditingController();
   final Auth _auth = Auth();
 
+  final _formKey = GlobalKey<FormState>();
+
   bool _isObscured = true;
 
   // Future<void> saveUserToFirestore(
@@ -61,129 +63,157 @@ class _NewUserScreenState extends State<NewUserScreen> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Hello There :)',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            TextField(
-                controller: _username,
-                decoration: InputDecoration(
-                  labelText: 'username',
-                  border: OutlineInputBorder(),
-                )),
-            SizedBox(
-              height: 10,
-            ),
-            TextField(
-              controller: _email,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Hello There :)',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _passWord,
-              decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _isObscured = !_isObscured;
-                        });
-                      },
-                      icon: Icon(
-                        _isObscured ? Icons.visibility_off : Icons.visibility,
-                      ))),
-              obscureText: _isObscured,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  bool isNew = await _auth.createUserWithEmailAndPassword(
-                      email: _email.text.trim(),
-                      password: _passWord.text.trim());
-                  log('${_email.text} ${_passWord.text}');
-                  if (isNew) {
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(_auth.currentUser?.uid)
-                        .set({
-                      'username': _username.text.trim(),
-                      'email': _email.text.trim(),
-                      'createdAt': FieldValue.serverTimestamp(),
-                    });
-
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()));
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Hello ${_username.text}')));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('An error occured')));
-                  }
-                  // Handle login logic
-                } on FirebaseException catch (e) {
-                  if (e.code == 'email-already-in-use') {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content:
-                              Text('Email already in use. Try logging in.')),
-                    );
-                  }
-                } catch (e) {
-                  log('Error signing in: $e');
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //     SnackBar(content: Text('Email already in use')));
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(9)),
-                backgroundColor: Colors.amberAccent,
-                minimumSize: Size(double.infinity, 50), // Full width button
-              ),
-              child: Text('Sign Up'),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text("Already have an account? "),
-                SizedBox(
-                  width: 5,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AuthScreen()));
-                    log('I have been touched helppp!');
+              SizedBox(height: 20),
+              TextFormField(
+                  controller: _username,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter a username';
+                    }
+                    return null;
                   },
-                  child: Text(
-                    'Log in instead',
-                    style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.blueGrey,
-                        decorationThickness: 2),
+                  decoration: InputDecoration(
+                    labelText: 'username',
+                    border: OutlineInputBorder(),
+                  )),
+              SizedBox(
+                height: 10,
+              ),
+              TextFormField(
+                controller: _email,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter an email';
+                  }
+                  if (value.isNotEmpty && !value.contains('@')) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: _passWord,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a password';
+                  }
+                  if (value.length < 6) {
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isObscured = !_isObscured;
+                          });
+                        },
+                        icon: Icon(
+                          _isObscured ? Icons.visibility_off : Icons.visibility,
+                        ))),
+                obscureText: _isObscured,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    try {
+                      bool isNew = await _auth.createUserWithEmailAndPassword(
+                          email: _email.text.trim(), password: _passWord.text.trim());
+                      log('${_email.text} ${_passWord.text}');
+                      if (isNew) {
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(_auth.currentUser?.uid)
+                            .set({
+                          'username': _username.text.trim(),
+                          'email': _email.text.trim(),
+                          'createdAt': FieldValue.serverTimestamp(),
+                        });
+
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text('Hello ${_username.text}')));
+                      } else {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text('An error occured')));
+                      }
+                      // Handle login logic
+                    } on FirebaseException catch (e) {
+                      if (e.code == 'email-already-in-use') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Email already in use. Try logging in.')),
+                        );
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.message}')),
+                      );
+                    } catch (e) {
+                      log('Error signing in: $e');
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(content: Text('Email already in use')));
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                  backgroundColor: Colors.amberAccent,
+                  minimumSize: Size(double.infinity, 50), // Full width button
+                ),
+                child: Text('Sign Up'),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Already have an account? "),
+                  SizedBox(
+                    width: 5,
                   ),
-                )
-              ],
-            )
-          ],
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context, MaterialPageRoute(builder: (context) => AuthScreen()));
+                      log('I have been touched helppp!');
+                    },
+                    child: Text(
+                      'Log in instead',
+                      style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.blueGrey,
+                          decorationThickness: 2),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
