@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steps_tracker/models/auth.dart';
 import 'package:steps_tracker/models/progress_bar.dart';
 import 'package:steps_tracker/models/step_tracker_model.dart';
@@ -16,6 +17,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Auth authentication = Auth();
   bool isExpanded = true;
+
+  void compundingSteps() async {
+    SharedPreferences compSteps = await SharedPreferences.getInstance();
+    
+  }
 
   @override
   void initState() {
