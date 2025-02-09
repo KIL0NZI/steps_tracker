@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:steps_tracker/models/auth.dart';
 import 'package:steps_tracker/screens/auth_screen.dart';
 import 'package:steps_tracker/tabs/home_page_tab.dart';
+import 'package:steps_tracker/tabs/target-steps.dart';
 
 class NewUserScreen extends StatefulWidget {
   const NewUserScreen({super.key});
@@ -152,7 +153,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
                         });
 
                         Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                            context, MaterialPageRoute(builder: (context) => TargetSteps()));
 
                         ScaffoldMessenger.of(context)
                             .showSnackBar(SnackBar(content: Text('Hello ${_username.text}')));
@@ -186,6 +187,39 @@ class _NewUserScreenState extends State<NewUserScreen> {
               ),
               SizedBox(
                 height: 10,
+              ),
+                            ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      bool result = await _auth.signInWithGoogle();
+                      if (result) {
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => TargetSteps()));
+                      }
+                    } catch (e) {
+                      log('haki ya nani ${e.toString()}');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                    backgroundColor: Colors.white,
+                    minimumSize: Size(double.infinity, 50), // Full width button
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.network(
+                        'http://pngimg.com/uploads/google/google_PNG19635.png',
+                        height: 40,
+                        width: 40,
+                        fit: BoxFit.cover,
+                      ),
+                      Text('Continue with Google')
+                    ],
+                  )),
+              SizedBox(
+                height: 8,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

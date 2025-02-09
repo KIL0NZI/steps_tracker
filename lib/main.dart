@@ -12,7 +12,7 @@ import 'package:workmanager/workmanager.dart';
 
 // This function is called periodically by Workmanager
 @pragma('vm:entry-point')
-Future<void> callbackDispatcher()async {
+Future<void> callbackDispatcher() async {
   Workmanager().executeTask((taskName, inputData) async {
     // Ensure Flutter bindings are initialized (for background execution)
     WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +54,7 @@ void main() async {
     "updateDailySteps",
     frequency: const Duration(minutes: 15), // adjust as needed
   );
-  
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isNew = prefs.getBool('isNew') ?? true;
   if (isNew) {
@@ -74,7 +74,7 @@ void main() async {
         BlocProvider(create: (_) => StepTrackerCubit()),
       ],
       child: MaterialApp(
-        home: isNew ? NewUserScreen() : HomeScreen(),
+        home: isNew ? HomeScreen() : NewUserScreen(),
         debugShowCheckedModeBanner: false,
       ),
     ),

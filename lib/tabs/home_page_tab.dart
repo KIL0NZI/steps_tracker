@@ -65,6 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         BlocBuilder<StepTrackerCubit, int>(
                           builder: (context, steps) {
                             log("Homescreen steps: $steps");
+                            final finalsteps = steps;
                             final int targetSteps = 10000;
                             final double progress =
                                 (steps / targetSteps).clamp(0.0, 1.0);
