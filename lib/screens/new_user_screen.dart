@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hive/hive.dart';
 import 'package:steps_tracker/models/auth.dart';
 import 'package:steps_tracker/screens/auth_screen.dart';
 import 'package:steps_tracker/tabs/home_page_tab.dart';
@@ -19,6 +20,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
   late final TextEditingController _username = TextEditingController();
   late final TextEditingController _passWord = TextEditingController();
   final Auth _auth = Auth();
+  final _myBox = Hive.box('myBox');
 
   final _formKey = GlobalKey<FormState>();
 
@@ -140,7 +142,8 @@ class _NewUserScreenState extends State<NewUserScreen> {
                   if (_formKey.currentState!.validate()) {
                     try {
                       bool isNew = await _auth.createUserWithEmailAndPassword(
-                          email: _email.text.trim(), password: _passWord.text.trim());
+                          email: _email.text.trim(),
+                          password: _passWord.text.trim());
                       log('${_email.text} ${_passWord.text}');
                       if (isNew) {
                         await FirebaseFirestore.instance
@@ -153,19 +156,23 @@ class _NewUserScreenState extends State<NewUserScreen> {
                         });
 
                         Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => TargetSteps()));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TargetSteps()));
 
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text('Hello ${_username.text}')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Hello ${_username.text}')));
                       } else {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text('An error occured')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('An error occured')));
                       }
                       // Handle login logic
                     } on FirebaseException catch (e) {
                       if (e.code == 'email-already-in-use') {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Email already in use. Try logging in.')),
+                          SnackBar(
+                              content: Text(
+                                  'Email already in use. Try logging in.')),
                         );
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +186,8 @@ class _NewUserScreenState extends State<NewUserScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(9)),
                   backgroundColor: Colors.amberAccent,
                   minimumSize: Size(double.infinity, 50), // Full width button
                 ),
@@ -188,20 +196,23 @@ class _NewUserScreenState extends State<NewUserScreen> {
               SizedBox(
                 height: 10,
               ),
-                            ElevatedButton(
+              ElevatedButton(
                   onPressed: () async {
                     try {
                       bool result = await _auth.signInWithGoogle();
                       if (result) {
                         Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => TargetSteps()));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TargetSteps()));
                       }
                     } catch (e) {
                       log('haki ya nani ${e.toString()}');
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9)),
                     backgroundColor: Colors.white,
                     minimumSize: Size(double.infinity, 50), // Full width button
                   ),
@@ -232,7 +243,9 @@ class _NewUserScreenState extends State<NewUserScreen> {
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => AuthScreen()));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AuthScreen()));
                       log('I have been touched helppp!');
                     },
                     child: Text(

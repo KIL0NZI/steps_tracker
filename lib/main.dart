@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steps_tracker/firebase_options.dart';
@@ -45,6 +46,10 @@ Future<void> callbackDispatcher() async {
 }
 
 void main() async {
+  await Hive.initFlutter();
+
+  var box = Hive.openBox('myBox');
+  
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Workmanager and schedule the periodic task.
