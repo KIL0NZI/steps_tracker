@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TargetSteps extends StatefulWidget {
   const TargetSteps({super.key});
@@ -8,48 +9,81 @@ class TargetSteps extends StatefulWidget {
 }
 
 class _TargetStepsState extends State<TargetSteps> {
-  double _targetSteps = 10000;
+  int _selectedIndex = 5; // Default selection (5000 steps)
+  List<int> stepValues = List.generate(
+      40, (index) => (index + 1) * 1000); // Steps from 1000 to 20000
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadStepTarget();
+  }
+
+  Future<void> _saveStepTarget(int target) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('step_target', target);
+  }
+
+  Future<void> _loadStepTarget() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int savedTarget = prefs.getInt('step_target') ?? 10000;
+    setState(() {
+      _selectedIndex = stepValues.indexOf(savedTarget);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text('Set Daily Steps Target'),
-            SizedBox(
-              height: 20,
-            ),
-            Slider(
-              value: _targetSteps,
-              min: 1000,
-              max: 40000,
-              divisions: 19, // Creates steps in multiples of 1000
-              label: "${_targetSteps.toInt()}",
-              onChanged: (value) {
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Target Steps: ${stepValues[_selectedIndex]} steps",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 20),
+          SizedBox(
+            height: 200, // Control height of the wheel picker
+            child: ListWheelScrollView.useDelegate(
+              itemExtent: 50,
+              physics: FixedExtentScrollPhysics(),
+              onSelectedItemChanged: (index) {
                 setState(() {
-                  _targetSteps = value;
+                  _selectedIndex = index;
                 });
               },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  SnackBar(
-                      content:
-                          Text("Target set to ${_targetSteps.toInt()} steps!"));
+              childDelegate: ListWheelChildBuilderDelegate(
+                builder: (context, index) {
+                  return Center(
+                    child: Text(
+                      "${stepValues[index]} steps",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
+                  );
                 },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9)),
-                ),
-                child: Text('Set Target'))
-          ],
-        ),
+                childCount: stepValues.length,
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              _saveStepTarget(stepValues[_selectedIndex]);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(
+                        "Target set to ${stepValues[_selectedIndex]} steps!")),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(9))),
+            child: Text("Set Target"),
+          ),
+        ],
       ),
     );
   }

@@ -154,7 +154,12 @@ class _NewUserScreenState extends State<NewUserScreen> {
                           'email': _email.text.trim(),
                           'createdAt': FieldValue.serverTimestamp(),
                         });
-
+                        if (_myBox.isEmpty) {
+                          await _myBox.put(1, _username.text.trim());
+                        } else {
+                          var userName = _myBox.get(1);
+                          log('$userName has entered the chat');
+                        }
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -164,7 +169,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
                             SnackBar(content: Text('Hello ${_username.text}')));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('An error occured')));
+                            SnackBar(content: Text('An error occured, Please try again')));
                       }
                       // Handle login logic
                     } on FirebaseException catch (e) {

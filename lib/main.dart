@@ -47,9 +47,8 @@ Future<void> callbackDispatcher() async {
 
 void main() async {
   await Hive.initFlutter();
+  await Hive.openBox('myBox');
 
-  var box = Hive.openBox('myBox');
-  
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Workmanager and schedule the periodic task.
