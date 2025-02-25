@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:steps_tracker/tabs/home_page_tab.dart';
 
 class TargetSteps extends StatefulWidget {
   const TargetSteps({super.key});
@@ -10,6 +12,7 @@ class TargetSteps extends StatefulWidget {
 
 class _TargetStepsState extends State<TargetSteps> {
   int _selectedIndex = 5; // Default selection (5000 steps)
+  final _targetStepsBox = Hive.box('targetStepsBox');
   List<int> stepValues = List.generate(
       40, (index) => (index + 1) * 1000); // Steps from 1000 to 20000
 
@@ -70,13 +73,22 @@ class _TargetStepsState extends State<TargetSteps> {
           ),
           SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              if (!_targetStepsBox.containsKey('targetsteps')) {
+                await _targetStepsBox.put('targetsteps', stepValues[_selectedIndex]);
+              } else {
+                await _targetStepsBox.put('targetsteps', stepValues[_selectedIndex]);
+              }
               _saveStepTarget(stepValues[_selectedIndex]);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text(
                         "Target set to ${stepValues[_selectedIndex]} steps!")),
               );
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomeScreen()));
             },
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(

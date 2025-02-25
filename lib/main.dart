@@ -47,7 +47,9 @@ Future<void> callbackDispatcher() async {
 
 void main() async {
   await Hive.initFlutter();
-  await Hive.openBox('myBox');
+  await Hive.openBox('userBox');
+  await Hive.openBox('targetStepsBox');
+  await Hive.openBox('googleUSerBox');
 
   WidgetsFlutterBinding.ensureInitialized();
 

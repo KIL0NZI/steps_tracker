@@ -20,7 +20,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
   late final TextEditingController _username = TextEditingController();
   late final TextEditingController _passWord = TextEditingController();
   final Auth _auth = Auth();
-  final _myBox = Hive.box('myBox');
+  final _userBox = Hive.box('userBox');
 
   final _formKey = GlobalKey<FormState>();
 
@@ -154,10 +154,10 @@ class _NewUserScreenState extends State<NewUserScreen> {
                           'email': _email.text.trim(),
                           'createdAt': FieldValue.serverTimestamp(),
                         });
-                        if (_myBox.isEmpty) {
-                          await _myBox.put(1, _username.text.trim());
+                        if (_userBox.isEmpty) {
+                          await _userBox.put(1, _username.text.trim());
                         } else {
-                          var userName = _myBox.get(1);
+                          var userName = _userBox.get(1);
                           log('$userName has entered the chat');
                         }
                         Navigator.pushReplacement(
@@ -205,6 +205,7 @@ class _NewUserScreenState extends State<NewUserScreen> {
                   onPressed: () async {
                     try {
                       bool result = await _auth.signInWithGoogle();
+
                       if (result) {
                         Navigator.pushReplacement(
                             context,

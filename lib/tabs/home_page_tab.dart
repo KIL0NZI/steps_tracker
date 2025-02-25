@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steps_tracker/models/auth.dart';
 import 'package:steps_tracker/models/progress_bar.dart';
@@ -18,15 +19,23 @@ class _HomeScreenState extends State<HomeScreen> {
   Auth authentication = Auth();
   bool isExpanded = true;
 
+  final _googleUSerBox = Hive.box('googleUSerBox');
+  final _userBox = Hive.box('userBox');
+  final _targetStepsBox = Hive.box('targetStepsBox');
+
+  late final profilePhoto = _googleUSerBox.get('profilephoto');
+  late final userName = _googleUSerBox.get('username');
+  late final targetSteps = _targetStepsBox.get('targetsteps');
+
   void compundingSteps() async {
     SharedPreferences compSteps = await SharedPreferences.getInstance();
-    
   }
 
   @override
   void initState() {
     super.initState();
     StepTrackerModel().initialize();
+
     // StepTrackerCubit().initialize();
     // StepTrackerCubit().reset();
   }
@@ -40,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverAppBar(
             automaticallyImplyLeading: false,
             backgroundColor: Colors.white,
-            expandedHeight: 400.0,
+            expandedHeight: 500.0,
             toolbarHeight: 100.0,
             floating: false,
             pinned: true,
@@ -62,11 +71,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Container(
+                          margin: EdgeInsets.all(20),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(35),
+                            color: Colors.white,
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                        image: NetworkImage(profilePhoto),
+                                        fit: BoxFit.cover)),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                'Hello, $userName',
+                                style: TextStyle(fontSize: 20),
+                              )
+                            ],
+                          ),
+                        ),
                         BlocBuilder<StepTrackerCubit, int>(
                           builder: (context, steps) {
                             log("Homescreen steps: $steps");
                             final finalsteps = steps;
-                            final int targetSteps = 10000;
                             final double progress =
                                 (steps / targetSteps).clamp(0.0, 1.0);
                             return Column(children: [

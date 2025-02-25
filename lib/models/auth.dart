@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class Auth {
   final _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _googleUserBox = Hive.box('googleUserBox');
 
   User? get currentUser => _firebaseAuth.currentUser;
 
@@ -73,6 +75,14 @@ class Auth {
             'uid': user.uid,
             'profilephoto': user.photoURL
           });
+          log('User saved in Hive: ${user.displayName}, ${user.photoURL}');
+
+          // if (!_googleUserBox.containsKey(1) &&
+          //     !_googleUserBox.containsKey(2)) {
+            await _googleUserBox.put('username', user.displayName ?? 'no NAme');
+            await _googleUserBox.put('profilephoto', user.photoURL ?? 'no picture');
+            log('User saved in Hive: ${_googleUserBox.get('username')}, ${_googleUserBox.get('profilephoto')}');
+          // }
         }
       } else {
         log('aha gotcha');
