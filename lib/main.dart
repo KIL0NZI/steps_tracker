@@ -80,7 +80,7 @@ void main() async {
         BlocProvider(create: (_) => StepTrackerCubit()),
       ],
       child: MaterialApp(
-        home: isNew ? HomeScreen() : NewUserScreen(),
+        home: isNew ? NewUserScreen() : HomeScreen(),
         debugShowCheckedModeBanner: false,
       ),
     ),

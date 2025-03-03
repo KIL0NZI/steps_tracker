@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -26,6 +28,24 @@ class _HomeScreenState extends State<HomeScreen> {
   late final profilePhoto = _googleUSerBox.get('profilephoto');
   late final userName = _googleUSerBox.get('username');
   late final targetSteps = _targetStepsBox.get('targetsteps');
+
+  // ignore: non_constant_identifier_names
+
+  // listener: (context, state) async {
+
+  //   // if (state is MyCubitUpdatedState) {
+  //   //   // Get current user ID
+  //   //   String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  //   //   // Update Firestore with the new state
+  //   //   await FirebaseFirestore.instance.collection('users').doc(uid).set({
+  //   //     'user': state.value1,
+  //   //     'steps': state.value2,
+  //   //     // Add other fields as needed
+  //   //   });
+  //   //   log('Data updated in Firestore');
+  //   // }
+  // })
 
   void compundingSteps() async {
     SharedPreferences compSteps = await SharedPreferences.getInstance();
@@ -59,6 +79,37 @@ class _HomeScreenState extends State<HomeScreen> {
               isExpanded = appBarHeight > 150;
 
               return FlexibleSpaceBar(
+                title: BlocBuilder<StepTrackerCubit, int>(
+                    builder: (context, steps) {
+                  if (isExpanded) {
+                    return SizedBox(
+                      height: .1,
+                    );
+                  } else {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: NetworkImage(profilePhoto),
+                                  fit: BoxFit.cover)),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text('$steps steps')
+                      ],
+                    );
+                  }
+                }),
                 background: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -71,6 +122,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Stack(
+                        //   children: [
+
+                        //   ],
+                        // )
                         Container(
                           margin: EdgeInsets.all(20),
                           padding: EdgeInsets.all(10),
@@ -103,7 +159,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         BlocBuilder<StepTrackerCubit, int>(
                           builder: (context, steps) {
                             log("Homescreen steps: $steps");
-                            final finalsteps = steps;
                             final double progress =
                                 (steps / targetSteps).clamp(0.0, 1.0);
                             return Column(children: [
@@ -134,6 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ]);
                           },
                         ),
+                        // BlocListener<StepTrackerCubit, int>(
+                        //   listener: (context, state),),
                         const Text(
                           'steps',
                           style: TextStyle(
