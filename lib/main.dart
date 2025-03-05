@@ -10,6 +10,7 @@ import 'package:steps_tracker/state/steps_tracker_cubit.dart';
 import 'package:steps_tracker/tabs/home_page_tab.dart';
 import 'package:steps_tracker/screens/new_user_screen.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // This function is called periodically by Workmanager
 @pragma('vm:entry-point')
@@ -45,6 +46,9 @@ Future<void> callbackDispatcher() async {
   });
 }
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
 void main() async {
   await Hive.initFlutter();
   await Hive.openBox('userBox');
@@ -60,6 +64,14 @@ void main() async {
     "updateDailySteps",
     frequency: const Duration(minutes: 15), // adjust as needed
   );
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isNew = prefs.getBool('isNew') ?? true;

@@ -4,9 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steps_tracker/models/step_tracker_model.dart';
 import 'package:steps_tracker/services/permission_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:steps_tracker/models/user_data_fetch.dart';
 
 class StepTrackerCubit extends Cubit<int> {
   final StepTrackerModel _stepTrackerModel = StepTrackerModel();
+  final UserDataFetch _userDataFetch = UserDataFetch();
 
   StepTrackerCubit() : super(0) {
     _initialize();
@@ -15,15 +18,16 @@ class StepTrackerCubit extends Cubit<int> {
   void _initialize() async {
     // Retrieve saved steps from persistent storage.
     final prefs = await SharedPreferences.getInstance();
-    final savedSteps = prefs.getInt('savedSteps') ?? 0;
-    emit(savedSteps); // Emit the persisted count as the initial state.
+    final dailySteps = prefs.getInt('dailySteps') ?? 0;
+    emit(dailySteps); // Emit the persisted count as the initial state.
 
     final hasPermission = await PermissionsService.requestStepPermissions();
     if (hasPermission) {
       log('Permission granted');
       await _stepTrackerModel.initialize();
       _stepTrackerModel.stepCountStream.listen((event) {
-        if (event > savedSteps) {
+        _userDataFetch.postUserData(event);
+        if (event > dailySteps) {
           emit(event);
           log('Steps updated: $event');
           _saveSteps(event);
@@ -69,7 +73,7 @@ class StepTrackerCubit extends Cubit<int> {
     } else {
       // Compute daily steps as the difference between current steps and the baseline.
       final baseline = prefs.getInt('baselineSteps') ?? steps;
-      final dailySteps = steps - baseline;
+      final dailySteps = steps;
       prefs.setInt('dailySteps', dailySteps);
       log('Daily steps updated: $dailySteps (Current: $steps, Baseline: $baseline)');
     }

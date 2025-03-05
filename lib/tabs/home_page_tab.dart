@@ -3,12 +3,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:steps_tracker/main.dart';
 import 'package:steps_tracker/models/auth.dart';
 import 'package:steps_tracker/models/progress_bar.dart';
 import 'package:steps_tracker/models/step_tracker_model.dart';
+import 'package:steps_tracker/models/user_info_card.dart';
+import 'package:steps_tracker/models/users_steps.dart';
 import 'package:steps_tracker/state/steps_tracker_cubit.dart';
+import 'package:steps_tracker/tabs/steps_actions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -55,9 +60,39 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     StepTrackerModel().initialize();
-
+    showGreetingNotification();
     // StepTrackerCubit().initialize();
     // StepTrackerCubit().reset();
+  }
+
+  Future<void> showGreetingNotification() async {
+    int hour = DateTime.now().hour;
+    String greeting;
+
+    if (hour >= 5 && hour < 12) {
+      greeting = "Good Morning! ☀️ $userName";
+    } else if (hour >= 12 && hour < 18) {
+      greeting = "Good Afternoon! 🌤️ $userName";
+    } else {
+      greeting = "Good Evening! 🌙 $userName";
+    }
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'greeting_channel',
+      'Greeting Notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      greeting,
+      "Let's get those steps in!",
+      platformChannelSpecifics,
+    );
   }
 
   @override
@@ -120,41 +155,40 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: SafeArea(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Stack(
-                        //   children: [
-
-                        //   ],
-                        // )
-                        Container(
-                          margin: EdgeInsets.all(20),
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(35),
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 50,
-                                height: 50,
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                        image: NetworkImage(profilePhoto),
-                                        fit: BoxFit.cover)),
+                        Row(
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 10, top: 10),
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: NetworkImage(profilePhoto),
+                                      fit: BoxFit.cover)),
+                            ),
+                            SizedBox(
+                              width: 315,
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 18),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              StepsActions()));
+                                },
+                                child: Icon(
+                                  Icons.menu,
+                                  size: 35,
+                                ),
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                'Hello, $userName',
-                                style: TextStyle(fontSize: 20),
-                              )
-                            ],
-                          ),
+                            )
+                          ],
                         ),
                         BlocBuilder<StepTrackerCubit, int>(
                           builder: (context, steps) {
@@ -211,88 +245,46 @@ class _HomeScreenState extends State<HomeScreen> {
         scrollDirection: Axis.vertical,
         child: leaderBoard(),
       ),
-    )
-        // Center(
-        //   child: Container(
-        //     color: Colors.white,
-        //     // padding: EdgeInsets.all(200.0), // Optional: adds background color
-        //     child: Row(
-        //         mainAxisAlignment: MainAxisAlignment.center,
-        //         crossAxisAlignment: CrossAxisAlignment.start,
-        //         children: [
-        //           ElevatedButton(
-        //               onPressed: () {
-        //                 // TODO: Add reset logic here
-        //                 context.read<StepTrackerCubit>().reset();
-        //               },
-        //               child: Text('Reset'))
-        //         ]),
-        //   ),
-        // ),
-        );
+    ));
   }
 
   Widget leaderBoard() {
+    var hasData = true;
+
     List<TableRow> rows = [];
     for (int i = 1; i < 101; i++) {
       rows.add(TableRow(children: [
-        Padding(
-            padding: EdgeInsets.only(top: 15, bottom: 15),
-            child: Row(
-              children: [
-                // Stack(
-                //   children: [
-                // Container(
-                //   color: Colors.grey,
-                //   decoration: BoxDecoration(shape: BoxShape.circle),
-                // ),
-                //   ],
-                // ),
-                Text(
-                  i.toString(),
-                  style: TextStyle(fontSize: 20),
-                ),
-
-                SizedBox(
-                  width: 40,
-                ),
-                Text(
-                  "*user*",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                  ),
-                ),
-              ],
-            )),
-        Padding(
-          padding: EdgeInsets.only(left: 50, top: 15, bottom: 15),
-          child: BlocBuilder<StepTrackerCubit, int>(builder: (context, steps) {
-            return Text(
-              '$steps steps',
-              style: TextStyle(fontSize: 20),
-            );
-          }),
-        )
+        Text(i.toString())
       ]));
     }
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 30,
-            ),
-            child: Table(
-              border: TableBorder.symmetric(
 
-                  // top: BorderSide(color: Colors.blue, width: 2.0),
-                  // bottom: BorderSide(color: Colors.blue, width: 2.0),
-                  ),
-              children: rows,
+    if (hasData) {
+      return ListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: 100,
+        itemBuilder: (context, index){
+          return UserInfoCard(profilePicture: UsersSteps().profilepicture, userName: , steps: null,)
+        },);
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(
+                horizontal: 30,
+              ),
+              child: Table(
+                children: rows,
+              ),
+            )
+          ]);
+    } else {
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 150,
             ),
-          )
-        ]);
+            CircularProgressIndicator(),
+          ]);
+    }
   }
 }

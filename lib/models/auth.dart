@@ -52,7 +52,7 @@ class Auth {
   }
 
   Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+    await FirebaseAuth.instance.signOut();
   }
 
   Future<bool> signInWithGoogle() async {
@@ -79,9 +79,11 @@ class Auth {
 
           // if (!_googleUserBox.containsKey(1) &&
           //     !_googleUserBox.containsKey(2)) {
-            await _googleUserBox.put('username', user.displayName ?? 'no NAme');
-            await _googleUserBox.put('profilephoto', user.photoURL ?? 'no picture');
-            log('User saved in Hive: ${_googleUserBox.get('username')}, ${_googleUserBox.get('profilephoto')}');
+          await _googleUserBox.put('username', user.displayName ?? 'no Name');
+          await _googleUserBox.put(
+              'profilephoto', user.photoURL ?? 'no picture');
+          await _googleUserBox.put('uid', user.uid);
+          log('User saved in Hive: ${_googleUserBox.get('username')}, ${_googleUserBox.get('profilephoto')}');
           // }
         }
       } else {
